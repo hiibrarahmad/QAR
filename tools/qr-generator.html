@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>QR Generator — AR-ready</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0d1117; color: #e6edf3;
+           display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 32px; }
+    input { width: min(480px, 90vw); padding: 12px; font-size: 1rem; border-radius: 8px;
+            border: 1px solid #30363d; background: #161b22; color: #e6edf3; }
+    button { background: #2f81f7; color: #fff; border: none; border-radius: 8px;
+             padding: 12px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    canvas { background: #fff; border-radius: 12px; max-width: min(500px, 90vw); height: auto; }
+    a { color: #2f81f7; }
+    .hint { color: #9aa4b2; font-size: .9rem; max-width: 520px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>AR-ready QR Generator</h1>
+  <p class="hint">Enter the final HTTPS URL where index.html will be hosted.
+     Keep it short — shorter URL = fewer QR modules = easier scanning &amp; tracking.</p>
+  <input id="url" type="url" placeholder="https://your-site.netlify.app" value="https://" />
+  <button id="go">Generate</button>
+  <canvas id="card" width="1200" height="1200" style="display:none"></canvas>
+  <a id="dl" download="qr-card.png" style="display:none">⬇ Download qr-card.png</a>
+  <p class="hint" id="next" style="display:none">
+    Next: open <b>target-compiler.html</b> and compile this exact PNG into <b>targets.mind</b>.
+    Print it at least 6×6 cm. The decorations around the QR are intentional — they give the
+    AR tracker unique features to lock onto, while the quiet zone keeps it scannable.</p>
+
+<script>
+document.querySelector("#go").addEventListener("click", async () => {
+  const url = document.querySelector("#url").value.trim();
+  if (!/^https:\/\/.+\..+/.test(url)) { alert("Enter a valid https:// URL"); return; }
+
+  const card = document.querySelector("#card");
+  const ctx = card.getContext("2d");
+  const W = 1200;
+
+  // white card
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, W, W);
+
+  // QR (error correction H = 30% damage tolerance) centered with generous quiet zone
+  const qrCanvas = document.createElement("canvas");
+  await QRCode.toCanvas(qrCanvas, url, { errorCorrectionLevel: "H", margin: 0, width: 760 });
+  ctx.drawImage(qrCanvas, (W - 760) / 2, (W - 760) / 2);
+
+  // --- decorative, asymmetric features OUTSIDE the quiet zone (helps AR tracking) ---
+  ctx.fillStyle = "#2f81f7";
+  ctx.beginPath(); ctx.arc(95, 95, 55, 0, Math.PI * 2); ctx.fill();          // top-left circle
+  ctx.fillStyle = "#e5484d";
+  ctx.beginPath();                                                            // top-right triangle
+  ctx.moveTo(W - 150, 55); ctx.lineTo(W - 55, 55); ctx.lineTo(W - 55, 150); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#46a758";
+  ctx.fillRect(55, W - 150, 95, 95);                                          // bottom-left square
+  ctx.fillStyle = "#f5a623";
+  ctx.beginPath();                                                            // bottom-right diamond
+  ctx.moveTo(W - 102, W - 155); ctx.lineTo(W - 50, W - 102); ctx.lineTo(W - 102, W - 50);
+  ctx.lineTo(W - 155, W - 102); ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle = "#0d1117";
+  ctx.font = "bold 52px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("SCAN ME — AR INSIDE", W / 2, 115);
+  ctx.font = "34px system-ui, sans-serif";
+  ctx.fillStyle = "#57606a";
+  ctx.fillText("Keep the code in view after scanning", W / 2, W - 82);
+
+  card.style.display = "block";
+  const dl = document.querySelector("#dl");
+  dl.href = card.toDataURL("image/png");
+  dl.style.display = "block";
+  document.querySelector("#next").style.display = "block";
+});
+</script>
+</body>
+</html>
