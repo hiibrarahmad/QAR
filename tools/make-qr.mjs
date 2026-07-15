@@ -51,26 +51,29 @@ function shape(x, y, s, color, kind, rot) {
   }
 }
 
-// scatter shapes in the border band, avoiding the QR zone and the text strips
+// Scatter shapes in the border band, avoiding the QR zone and the text strips.
+// Bigger, higher-contrast, denser features survive MindAR's internal downsampling
+// (it only analyzes a ~256px and ~128px version of the card) better than small,
+// faint ones — that's what determines how far away the camera can still detect it.
 const shapes = [];
 let attempts = 0;
 const placed = [];
-while (shapes.length < 60 && attempts++ < 4000) {
-  const s = 18 + rnd() * 30;
-  const x = 30 + rnd() * (W - 60);
-  const y = 30 + rnd() * (W - 60);
+while (shapes.length < 110 && attempts++ < 8000) {
+  const s = 26 + rnd() * 40;
+  const x = 26 + rnd() * (W - 52);
+  const y = 26 + rnd() * (W - 52);
   const m = s / 2 + 6;
   const inQRZone = x > CLEAR - m && x < W - CLEAR + m && y > CLEAR - m && y < W - CLEAR + m;
   const inTopText = y < 165 && x > 170 && x < W - 170;
   const inBotText = y > W - 165 && x > 220 && x < W - 220;
-  const collides = placed.some(p => Math.hypot(p.x - x, p.y - y) < (p.s + s) / 2 + 10);
+  const collides = placed.some(p => Math.hypot(p.x - x, p.y - y) < (p.s + s) / 2 + 6);
   if (inQRZone || inTopText || inBotText || collides) continue;
   placed.push({ x, y, s });
   shapes.push(shape(x, y, s, colors[(rnd() * colors.length) | 0], (rnd() * 5) | 0, (rnd() * 360) | 0));
 }
 
 // corner brackets hugging the QR quiet zone — strong, distinctive corners
-const B = CLEAR - 12, L = 92, SWl = 13;
+const B = CLEAR - 12, L = 110, SWl = 20;
 const brackets = [
   `M${B - L},${B} H${B} V${B - L}`,
   `M${W - B + L},${B} H${W - B} V${B - L}`,
