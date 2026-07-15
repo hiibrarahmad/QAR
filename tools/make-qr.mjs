@@ -84,7 +84,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}" 
 <g transform="translate(${OFF},${OFF}) scale(${QR / size})"><path d="${d}" fill="#000000"/></g>
 ${brackets}
 ${shapes.join("\n")}
-<text x="${W / 2}" y="84" text-anchor="middle" font-family="Arial, sans-serif" font-size="50" font-weight="bold" fill="#0d1117">MINDTUNE INNOVATIONS</text>
+<text x="${W / 2}" y="84" text-anchor="middle" font-family="Arial, sans-serif" font-size="50" font-weight="bold" fill="#0d1117">HIIBRARAHMAD</text>
 <text x="${W / 2}" y="138" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#2f81f7" font-weight="bold">SCAN WITH YOUR CAMERA — AR INSIDE</text>
 <text x="${W / 2}" y="${W - 108}" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" fill="#57606a">Keep the code in view after scanning</text>
 <text x="${W / 2}" y="${W - 62}" text-anchor="middle" font-family="Consolas, monospace" font-size="26" fill="#8b949e">${url.replace("https://", "")}</text>
